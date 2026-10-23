@@ -8,13 +8,12 @@
 <body>
      <header class="navbar">
     <h1 class="logo">QUIZ PULSE</h1>
-   <a href="#home.html">home</a>
+     </header>
 <!--Home screen-->
     <section id="home-screen" class="screen active">
       <div class="pill-badge">Test . Learn . Improve</div>
       <h1 class="hero-title">Select Your <span class="highlight">Quiz Topic </span></h1>
        <p class="hero-desc">Take quick, challenging quizzes from a variety of topics. Test your knowledge, learn new things, and track your progress all in one place.</p>
-      <button id="get-started-btn" class="btn btn-primary">Start Quiz &rarr;</button>
       <h2 class="section-title">1.Choose category</h2>
       <div class="category-grid">
         <div class="purple-card">
@@ -23,34 +22,108 @@
         </div>
         <div class ="purple-card">
             <h3>Computers tech</h3>
-            <p>Hardware , software & digital world</p>
+            <p>Hardware,software & digital world</p>
         </div>
         <div class ="purple-card">
             <h3>Science & Nature</h3>
-            <p>Biology , physics , chemistry & space</p>
+            <p>Biology,physics,chemistry & space</p>
         </div>
         <div class ="purple-card">
             <h3>History</h3>
-            <p>World events , leaders & ancient eras</p>
+            <p>World events,leaders & ancient eras</p>
         </div>
         <div class ="purple-card">
             <h3>Geography</h3>
-            <p>Countries , capitals, maps & landforms</p>
+            <p>Countries,capitals,maps & landforms</p>
         </div>
         <div class ="purple-card">
             <h3>Films & Movies</h3>
-            <p>Cinema , blockbusters & actors</p>
+            <p>Cinema,blockbusters & actors</p>
         </div>
         <div class ="purple-card">
             <h3>Music</h3>
-            <p>Classics , pop hits , artists & instruments</p>
+            <p>Classics,pop hits,artists & instruments</p>
         </div>
         <div class ="purple-card">
         <h3>Sports</h3>
-            <p>Athletics , tournaments & champions</p>
+            <p>Athletics,tournaments & champions</p>
         </div>
         <h2 class="section-title">2.Customize Quiz Parameters</h2>
       <div class="quiz-grid">
-       
+        <!---Categories injected by JS-->
+       <div>
+        <h3>Difficulty level</h3>
+        <button>Any Difficulty</button>
+        <button>Easy</button>
+        <button>Medium</button>
+        <button>Hard</button>
+
+        <h3>Number of Questions</h3>
+        <button>5 Questions</button>
+        <button>10 Questions</button>
+        <button>15 Questions</button>
+       </div>
+       <button id="get-started-btn" class="btn btn-primary">Start Quiz &rarr;</button>
+       <div class="display"></div>
+       <!---Active Quiz--->
+       <section id="quiz-screen" class="screen">
+      <div class="quiz-status">
+        <span id="quiz-category-tag" class="pill-badge-small">General Knowledge</span>
+        <span id="question-tracker">Question 1 / 10</span>
+        <span id="timer-badge" class="timer-badge">15s</span>
+      </div>
+
+      <div class="progress-bar-container">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+
+      <h2 id="question-text" class="question-text">Loading question...</h2>
+
+      <div id="options-container" class="options-grid">
+        <!-- Option buttons injected by JS -->
+      </div>
+      <section id="results-screen" class="screen">
+      <span class="pill-badge">Quiz Completed!</span>
+      <h1 class="hero-title">Your Score: <span id="final-score" class="highlight">0%</span></h1>
+       <!-----Result screen---->
+      <div class="results-grid">
+        <article class="purple-card">
+          <h3 id="stat-correct">0 / 0</h3>
+          <p>Correct Answers</p>
+        </article>
+        <article class="purple-card">
+          <h3 id="stat-streak">0</h3>
+          <p>Max Streak</p>
+        </article>
+      </div>
+
+      <div class="quiz-footer">
+        <button id="next-btn" class="btn btn-primary" style="display: none;">Next Question &rarr;</button>
+      </div>
+      <a href="quiz.html" class="btn btn-primary">Play Again &rarr;</a>
+    </section>
+    <!-- ADMIN: ADD CUSTOM QUESTION FORM (POST CRUD Demo) -->
+    <section class="admin-section">
+      <h2>Add Custom Question to API Database</h2>
+      <form id="custom-question-form">
+        <input type="text" id="input-question" placeholder="Question string" required>
+        <input type="text" id="input-category" placeholder="Category" required>
+        <select id="input-difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <input type="text" id="opt-1" placeholder="Option 1" required>
+        <input type="text" id="opt-2" placeholder="Option 2" required>
+        <input type="text" id="opt-3" placeholder="Option 3" required>
+        <input type="text" id="opt-4" placeholder="Option 4" required>
+        <input type="text" id="opt-correct" placeholder="Exact Correct Answer" required>
+        <button type="submit" class="btn btn-primary">Save to Database</button>
+      </form>
+    </section>
+        <footer class= "footer">
+            <p> It's Time for a Quiz</p>
+        </div>
+   <script type="module" src="js"></script>
 </body>
 </html>
