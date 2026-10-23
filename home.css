@@ -1,0 +1,205 @@
+/*QUIZ PULSE - LANDING PAGE STYLESHEET*/
+
+/*Color & Design*/
+:root {
+  --header-pink: #DC52A1;
+  --pill-pink: #F58BE2;
+  --button-pink: #ED60CE;
+  --purple-card: #8E58D6;
+  --dark-text: #000000;
+  --body-text: #1a1a1a;
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--white);
+  color: var(--dark-text);
+  line-height: 1.4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+#landing-screen {
+    padding-left: 1rem;
+}
+
+/*Navbar*/
+.navbar {
+  background-color: var(--header-pink);
+  height: 64px;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo, 
+.logo a {
+  color: var(--white);
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.script-tag {
+  color: var(--white);
+  font-family: 'Caveat', cursive, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/*Main Page Container*/
+.container {
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+  flex: 1;
+}
+
+/*Hero Section*/
+.hero-section {
+  margin-bottom: 50px;
+}
+
+.pill-badge {
+  display: inline-block;
+  background-color: var(--pill-pink);
+  color: var(--dark-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  margin-top: 1rem;
+}
+
+.hero-title {
+  font-size: 3.8rem;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -1px;
+  margin-bottom: 20px;
+  color: var(--dark-text);
+}
+
+.highlight {
+  color: var(--pill-pink);
+}
+
+.hero-desc {
+  max-width: 540px;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--body-text);
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+/*Get Started-button */
+.btn-primary {
+  display: inline-block;
+  background-color: var(--button-pink);
+  color: var(--dark-text);
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+/*Features Section*/
+.features-section {
+  margin-bottom: 60px;
+}
+
+.features-title {
+  color: var(--pill-pink);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+}
+
+/*Column Layout*/
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.purple-card {
+  background-color: var(--purple-card);
+  padding: 24px 20px;
+  border-radius: 2px;
+  min-height: 130px;
+}
+
+.purple-card h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--dark-text);
+  margin-bottom: 8px;
+}
+
+.purple-card p {
+  font-size: 0.9rem;
+  color: var(--dark-text);
+  line-height: 1.35;
+}
+
+.purple-card:nth-child(4) {
+  grid-column: 2;
+}
+
+/*Footer*/
+.footer {
+  text-align: center;
+  padding: 30px 20px;
+  margin-top: auto;
+}
+
+.typewriter-text {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: var(--dark-text);
+}
+
+/* Responsive layout*/
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.8rem;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .purple-card:nth-child(4) {
+    grid-column: 1;
+  }
+
+  .navbar {
+    padding: 0 20px;
+  }
+}

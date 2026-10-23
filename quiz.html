@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
+    <link rel="stylesheet" href="quiz.css">
 </head>
 <body>
      <header class="navbar">
@@ -64,63 +65,11 @@
         <button>15 Questions</button>
        </div>
        <button id="get-started-btn" class="btn btn-primary">Start Quiz &rarr;</button>
-       <div class="display"></div>
-       <!---Active Quiz--->
-       <section id="quiz-screen" class="screen">
-      <div class="quiz-status">
-        <span id="quiz-category-tag" class="pill-badge-small">General Knowledge</span>
-        <span id="question-tracker">Question 1 / 10</span>
-        <span id="timer-badge" class="timer-badge">15s</span>
-      </div>
-
-      <div class="progress-bar-container">
-        <div id="progress-fill" class="progress-fill"></div>
-      </div>
-
-      <h2 id="question-text" class="question-text">Loading question...</h2>
-
-      <div id="options-container" class="options-grid">
-        <!-- Option buttons injected by JS -->
-      </div>
-      <section id="results-screen" class="screen">
-      <span class="pill-badge">Quiz Completed!</span>
-      <h1 class="hero-title">Your Score: <span id="final-score" class="highlight">0%</span></h1>
-       <!-----Result screen---->
-      <div class="results-grid">
-        <article class="purple-card">
-          <h3 id="stat-correct">0 / 0</h3>
-          <p>Correct Answers</p>
-        </article>
-        <article class="purple-card">
-          <h3 id="stat-streak">0</h3>
-          <p>Max Streak</p>
-        </article>
-      </div>
-
-      <div class="quiz-footer">
-        <button id="next-btn" class="btn btn-primary" style="display: none;">Next Question &rarr;</button>
-      </div>
-      <a href="quiz.html" class="btn btn-primary">Play Again &rarr;</a>
-    </section>
-    <!-- ADMIN: ADD CUSTOM QUESTION FORM (POST CRUD Demo) -->
-    <section class="admin-section">
-      <h2>Add Custom Question to API Database</h2>
-      <form id="custom-question-form">
-        <input type="text" id="input-question" placeholder="Question string" required>
-        <input type="text" id="input-category" placeholder="Category" required>
-        <select id="input-difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-        <input type="text" id="opt-1" placeholder="Option 1" required>
-        <input type="text" id="opt-2" placeholder="Option 2" required>
-        <input type="text" id="opt-3" placeholder="Option 3" required>
-        <input type="text" id="opt-4" placeholder="Option 4" required>
-        <input type="text" id="opt-correct" placeholder="Exact Correct Answer" required>
-        <button type="submit" class="btn btn-primary">Save to Database</button>
-      </form>
-    </section>
+       <!-- HTML container -->
+            <div id="quiz-container">
+              <h2 id="question-text">Loading question...</h2>
+            <div id="options-container" class="options-grid"></div>
+            </div>
         <footer class= "footer">
             <p> It's Time for a Quiz</p>
         </div>
