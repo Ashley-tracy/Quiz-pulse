@@ -1,13 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // --- 1. State Variables ---
-    let selectedCategory = '9'; // Default: General Knowledge
-    let selectedDifficulty = ''; // Default: Any
-    let selectedAmount = '5'; // Default: 5
+    let selectedCategory = '9';
+    let selectedDifficulty = '';
+    let selectedAmount = '5';
 
     let quizQuestions = [];
     let currentQuestionIndex = 0;
     let score = 0;
+    let userAnswers = []; 
 
     // --- 2. DOM Elements ---
     const setupSection = document.getElementById('setup-section');
@@ -15,31 +16,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const historySection = document.getElementById('history-section');
     
     const startQuizBtn = document.getElementById('start-quiz-btn');
-    const nextBtn = document.getElementById('next-btn');
     const questionContainer = document.getElementById('question-container');
     const quizResults = document.getElementById('quiz-results');
     const finalScoreText = document.getElementById('final-score');
     const historyContainer = document.getElementById('history-container');
 
     // --- 3. Setup Logic (Category & Pills) ---
-
-    // Category Selection
     const categoryCards = document.querySelectorAll('.category-card');
     categoryCards.forEach(card => {
         card.addEventListener('click', () => {
-            // Remove "Selected" from all
             categoryCards.forEach(c => {
                 const pill = c.querySelector('.selected-pill');
                 if (pill) pill.remove();
             });
-            
-            // Add "Selected" to clicked
             const pill = document.createElement('span');
             pill.className = 'selected-pill';
             pill.textContent = 'Selected';
             card.appendChild(pill);
 
-            // Update state (Mapping card titles to OpenTriviaDB category IDs)
             const title = card.querySelector('h3').textContent;
             if (title.includes('General')) selectedCategory = '9';
             else if (title.includes('Computers')) selectedCategory = '18';
@@ -52,27 +46,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Difficulty & Amount Selection
     const paramGroups = document.querySelectorAll('.param-group');
     paramGroups.forEach(group => {
         const buttons = group.querySelectorAll('.pill-btn');
         buttons.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Visual active state
-                buttons.forEach(b => {
-                    b.style.opacity = '0.5';
-                    b.style.transform = 'scale(1)';
-                });
+                buttons.forEach(b => { b.style.opacity = '0.5'; b.style.transform = 'scale(1)'; });
                 btn.style.opacity = '1';
                 btn.style.transform = 'scale(1.05)';
 
-                // Update state based on text
                 const text = btn.textContent.trim();
                 if (text === 'Easy') selectedDifficulty = 'easy';
                 else if (text === 'Medium') selectedDifficulty = 'medium';
                 else if (text === 'Hard') selectedDifficulty = 'hard';
                 else if (text === 'Any Difficulty') selectedDifficulty = '';
-                
                 if (text === '5 Questions') selectedAmount = '5';
                 else if (text === '10 Questions') selectedAmount = '10';
                 else if (text === '15 Questions') selectedAmount = '15';
@@ -80,13 +67,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 4. Fetch & Start Quiz Logic ---
+    // --- 4. Start Quiz ---
+    let lastRequestTime = 0;
     startQuizBtn.addEventListener('click', async () => {
+        const now = Date.now();
+        if (now - lastRequestTime < 5000) {
+            const wait = Math.ceil((5000 - (now - lastRequestTime)) / 1000);
+            alert(`Please wait ${wait} more second(s) before starting a new quiz.`);
+            return;
+        }
+        lastRequestTime = now;
+
         startQuizBtn.textContent = 'Loading...';
         startQuizBtn.disabled = true;
-     // Using allorigins proxy to prevent CORS issues
-        const apiUrl = `https://api.allorigins.win/raw?url=https://opentdb.com/api.php?amount=${selectedAmount}&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`;
-        
+
+        // Using utest proxy for the Quiz App
+        const targetUrl = `https://opentdb.com/api.php?amount=${selectedAmount}&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`;
+        const workerUrl = 'https://utestproxy.kipkoechdun676.workers.dev/';
+        const apiUrl = `${workerUrl}?url=${encodeURIComponent(targetUrl)}`;
         try {
             const response = await fetch(apiUrl);
             const data = await response.json();
@@ -95,128 +93,170 @@ document.addEventListener('DOMContentLoaded', () => {
                 quizQuestions = data.results;
                 currentQuestionIndex = 0;
                 score = 0;
+                userAnswers = [];
 
-                // Switch screens
                 setupSection.style.display = 'none';
+                historySection.style.display = 'none'; // Hide history during quiz
                 quizSection.style.display = 'block';
-                historySection.style.display = 'none';
                 quizResults.style.display = 'none';
-                nextBtn.style.display = 'none';
 
                 renderQuestion();
             } else if (data.response_code === 5) {
-                alert('Rate limit hit! OpenTDB requires 5 seconds between requests. Please wait a moment and try again.');
+                alert('Rate limit hit! Please wait a moment and try again.');
             } else {
-                alert('Could not find enough questions for these settings. Try lowering the difficulty or choosing a different category.');
+                alert('Could not find enough questions for these settings. Try different options.');
             }
         } catch (error) {
             console.error(error);
-            alert('Failed to connect to the quiz API. Please check your internet connection.');
+            alert('Failed to connect to the quiz API.');
         } finally {
             startQuizBtn.textContent = 'Start Quiz →';
             startQuizBtn.disabled = false;
         }
     });
 
-    // --- 5. Render Question ---
+    // --- 5. Render Question (with Navigation) ---
     function renderQuestion() {
         const q = quizQuestions[currentQuestionIndex];
-        
-        // Function to decode HTML entities (like &quot;)
         const decodeText = (str) => {
             const doc = new DOMParser().parseFromString(str, "text/html");
             return doc.documentElement.textContent;
         };
 
-        const questionText = decodeText(q.question);
-        
-        // Combine and shuffle answers
         let answers = [...q.incorrect_answers.map(decodeText), decodeText(q.correct_answer)];
         answers = answers.sort(() => Math.random() - 0.5);
+        const correctAnswer = decodeText(q.correct_answer);
 
-        // Build HTML
         questionContainer.innerHTML = `
             <h3 style="color: #d63691;">Question ${currentQuestionIndex + 1} of ${quizQuestions.length}</h3>
-            <p style="font-size: 1.2rem; margin-bottom: 20px;">${questionText}</p>
+            <p style="font-size: 1.2rem; margin-bottom: 20px;">${decodeText(q.question)}</p>
             <div id="answers-wrapper"></div>
+            <div style="display:flex; justify-content: space-between; margin-top: 20px;">
+                <button id="prev-nav-btn" style="display:${currentQuestionIndex === 0 ? 'none' : 'block'}; padding: 10px 20px; cursor: pointer;">&larr; Previous</button>
+                <button id="next-nav-btn" style="padding: 10px 20px; cursor: pointer;">${currentQuestionIndex === quizQuestions.length - 1 ? 'Finish Quiz →' : 'Next →'}</button>
+            </div>
         `;
 
         const answersWrapper = document.getElementById('answers-wrapper');
-        
         answers.forEach(answer => {
             const btn = document.createElement('button');
             btn.className = 'answer-btn';
             btn.textContent = answer;
-            btn.onclick = () => checkAnswer(btn, answer, decodeText(q.correct_answer));
+            btn.onclick = () => checkAnswer(btn, answer, correctAnswer);
             answersWrapper.appendChild(btn);
         });
 
-        nextBtn.style.display = 'none';
+        // Re-attach navigation events
+        document.getElementById('prev-nav-btn')?.addEventListener('click', goToPrevious);
+        document.getElementById('next-nav-btn').addEventListener('click', goToNext);
+
+        // If already answered, re-render the selected state
+        if (userAnswers[currentQuestionIndex]) {
+            restoreAnsweredState(userAnswers[currentQuestionIndex].selected, correctAnswer);
+        }
     }
-    
-        // --- 6. Check Answer Logic ---
+
+    // --- 6. Check Answer ---
     function checkAnswer(clickedBtn, selectedAnswer, correctAnswer) {
         const allButtons = document.querySelectorAll('.answer-btn');
         allButtons.forEach(btn => btn.disabled = true);
 
+        userAnswers[currentQuestionIndex] = { selected: selectedAnswer, correct: correctAnswer };
+
         if (selectedAnswer === correctAnswer) {
-            clickedBtn.style.backgroundColor = '#a8e6cf'; // Green
+            clickedBtn.style.backgroundColor = '#a8e6cf';
             clickedBtn.style.borderColor = '#1e8449';
             score++;
         } else {
-            clickedBtn.style.backgroundColor = '#ffaaa5'; // Red
+            clickedBtn.style.backgroundColor = '#ffaaa5';
             clickedBtn.style.borderColor = '#c0392b';
-            
-            // Highlight the correct answer
             allButtons.forEach(btn => {
                 if (btn.textContent === correctAnswer) {
-                    btn.style.backgroundColor = '#a8e6cf'; // Green
+                    btn.style.backgroundColor = '#a8e6cf';
                     btn.style.borderColor = '#1e8449';
                 }
             });
         }
-
-        nextBtn.style.display = 'block';
     }
 
-    // --- 7. Next Question Logic ---
-    nextBtn.addEventListener('click', () => {
+    // --- 7. Restore Answered State ---
+    function restoreAnsweredState(selected, correctAnswer) {
+        const allButtons = document.querySelectorAll('.answer-btn');
+        allButtons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent === correctAnswer) {
+                btn.style.backgroundColor = '#a8e6cf';
+                btn.style.borderColor = '#1e8449';
+            }
+            if (btn.textContent === selected && selected !== correctAnswer) {
+                btn.style.backgroundColor = '#ffaaa5';
+                btn.style.borderColor = '#c0392b';
+            }
+        });
+    }
+
+    // --- 8. Navigation ---
+    function goToPrevious() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            renderQuestion();
+        }
+    }
+
+    function goToNext() {
         currentQuestionIndex++;
-        
         if (currentQuestionIndex < quizQuestions.length) {
             renderQuestion();
         } else {
             finishQuiz();
         }
-    });
-
-    // --- 8. Finish Quiz & History ---
-    function finishQuiz() {
-        questionContainer.innerHTML = '';
-        nextBtn.style.display = 'none';
-        quizResults.style.display = 'block';
-        
-        finalScoreText.textContent = `You scored ${score} out of ${quizQuestions.length}`;
-        
-        saveHistory(score, quizQuestions.length);
-        renderHistory();
-        
-        // Show history section below results
-        historySection.style.display = 'block';
     }
 
+    // --- 9. Finish Quiz ---
+    function finishQuiz() {
+        questionContainer.innerHTML = '';
+        quizResults.style.display = 'block';
+
+        finalScoreText.textContent = `You scored ${score} out of ${quizQuestions.length}`;
+
+        saveHistory(score, quizQuestions.length);
+        renderHistory();
+
+        // Show home button
+        if (!document.getElementById('home-btn')) {
+            const home = document.createElement('button');
+            home.id = 'home-btn';
+            home.textContent = 'Back to Home';
+            home.style.marginTop = '20px';
+            home.style.padding = '10px 20px';
+            home.style.cursor = 'pointer';
+            home.onclick = () => {
+                quizSection.style.display = 'none';
+                setupSection.style.display = 'block';
+                historySection.style.display = 'block'; // Show history again
+                renderHistory();
+            };
+            quizResults.appendChild(home);
+        }
+    }
+
+    // --- 10. History (Expandable) ---
     function saveHistory(score, total) {
         let history = JSON.parse(localStorage.getItem('quizHistory')) || [];
-        
+
         const newRecord = {
-            date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+            date: new Date().toLocaleString(),
             score: score,
-            total: total
+            total: total,
+            questions: quizQuestions.map((q, i) => ({
+                question: q.question,
+                correct: q.correct_answer,
+                selected: userAnswers[i] ? userAnswers[i].selected : 'Not Answered'
+            }))
         };
 
         history.unshift(newRecord);
         if (history.length > 10) history.pop();
-        
         localStorage.setItem('quizHistory', JSON.stringify(history));
     }
 
@@ -232,34 +272,63 @@ document.addEventListener('DOMContentLoaded', () => {
         history.forEach((record, index) => {
             const div = document.createElement('div');
             div.className = 'history-item';
-            
+            div.style.marginBottom = '15px';
+            div.style.padding = '10px';
+            div.style.backgroundColor = '#f9f9f9';
+            div.style.borderRadius = '8px';
+
+            let questionsHtml = record.questions.map((q, qi) => {
+                const isCorrect = q.selected === q.correct;
+                const selectedColor = isCorrect ? 'green' : 'red';
+                return `
+                    <div style="margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+                        <p style="margin: 5px 0;"><strong>Q${qi + 1}: ${q.question}</strong></p>
+                        <p style="margin: 5px 0; font-size: 0.9rem;">Your answer: <span style="color: ${selectedColor}; font-weight: bold;">${q.selected}</span></p>
+                        <p style="margin: 5px 0; font-size: 0.9rem;">Correct answer: <span style="color: green; font-weight: bold;">${q.correct}</span></p>
+                    </div>
+                `;
+            }).join('');
+
             div.innerHTML = `
-                <div>
-                    <strong>Score: ${record.score}/${record.total}</strong>
-                    <br><span style="font-size: 0.8rem; color: #666;">${record.date}</span>
+                <div style="display:flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>Score: ${record.score}/${record.total}</strong>
+                        <br><span style="font-size:0.8rem; color:#666;">${record.date}</span>
+                    </div>
+                    <div>
+                        <button class="view-btn" data-index="${index}" style="cursor:pointer; padding: 5px 10px; margin-right: 5px;">View</button>
+                        <button class="delete-btn" data-index="${index}" style="cursor:pointer; padding: 5px 10px; background-color: #ffaaa5; border: none; border-radius: 4px;">Delete</button>
+                    </div>
                 </div>
-                <button class="delete-btn" data-index="${index}">Delete</button>
+                <div class="history-detail" style="display:none; margin-top:15px;">
+                    ${questionsHtml}
+                </div>
             `;
             historyContainer.appendChild(div);
         });
 
-        // Attach delete events
+        // Delete event
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const index = e.target.getAttribute('data-index');
-                deleteHistory(index);
+                let history = JSON.parse(localStorage.getItem('quizHistory')) || [];
+                history.splice(index, 1);
+                localStorage.setItem('quizHistory', JSON.stringify(history));
+                renderHistory();
+            });
+        });
+
+        // View toggle event
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const detailDiv = e.target.closest('.history-item').querySelector('.history-detail');
+                detailDiv.style.display = detailDiv.style.display === 'none' ? 'block' : 'none';
             });
         });
     }
 
-    function deleteHistory(index) {
-        let history = JSON.parse(localStorage.getItem('quizHistory')) || [];
-        history.splice(index, 1);
-        localStorage.setItem('quizHistory', JSON.stringify(history));
-        renderHistory();
-    }
-
     // Initialize History on page load
     renderHistory();
+    historySection.style.display = 'block';
 
 });
