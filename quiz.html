@@ -3,80 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>Quiz Pulse</title>
     <link rel="stylesheet" href="quiz.css">
 </head>
 <body>
-     <header class="navbar">
-    <h1 class="logo">QUIZ PULSE</h1>
-     </header>
-<!--Home screen-->
-    <section id="home-screen" class="screen active">
-      <div class="pill-badge">Test . Learn . Improve</div>
-      <h1 class="hero-title">Select Your <span class="highlight">Quiz Topic </span></h1>
-       <p class="hero-desc">Take quick, challenging quizzes from a variety of topics. Test your knowledge, learn new things, and track your progress all in one place.</p>
-       <div>
-      <h2 class="section-title">1.Choose category</h2>
-      <div class="category-grid">
-        <div class="purple-card">
-          <h3>General Knowledge</h3>
-          <p>Trivia across all topics & pop culture </p>
-        </div>
-        <div class ="purple-card">
-            <h3>Computers tech</h3>
-            <p>Hardware,software & digital world</p>
-        </div>
-        <div class ="purple-card">
-            <h3>Science & Nature</h3>
-            <p>Biology,physics,chemistry & space</p>
-        </div>
-        <div class ="purple-card">
-            <h3>History</h3>
-            <p>World events,leaders & ancient eras</p>
-        </div>
-        <div class ="purple-card">
-            <h3>Geography</h3>
-            <p>Countries,capitals,maps & landforms</p>
-        </div>
-        <div class ="purple-card">
-            <h3>Films & Movies</h3>
-            <p>Cinema,blockbusters & actors</p>
-        </div>
-        <div class ="purple-card">
-            <h3>Music</h3>
-            <p>Classics,pop hits,artists & instruments</p>
-        </div>
-        <div class ="purple-card">
-        <h3>Sports</h3>
-            <p>Athletics,tournaments & champions</p>
-        </div>
-      </div>
-      <div>
-        <h2 class="section-title">2.Customize Quiz Parameters</h2><br>
-      <div class="quiz-grid">
-        <!---Categories injected by JS-->
-       <div class="dlevel">
-        <h3 id="dl">Difficulty level</h3>
-        <button>Any Difficulty</button>
-        <button>Easy</button>
-        <button>Medium</button>
-        <button>Hard</button>
+<!--Header-->
+    <header id="app-header">
+        <h1>QUIZ PULSE</h1>
+        <nav>
+            <a href="home.html">Home</a>
+        </nav>
+    </header>
 
-        <h3>Number of Questions</h3>
-        <button>5 Questions</button>
-        <button>10 Questions</button>
-        <button>15 Questions</button>
-       </div>
-      </div>
-       <button id="get-started-btn" class="btn btn-primary">Start Quiz &rarr;</button>
-       <!-- HTML container -->
-            <div id="quiz-container">
-              <h2 id="question-text">Loading question...</h2>
-            <div id="options-container" class="options-grid"></div>
+    <main id="main-container">
+        
+        <div id="setup-section">
+            <div class="badge">Test · Learn · Improve</div>
+            <h2>Select Your <span>Quiz Topic</span></h2>
+            <p>Choose a category below and customize your quiz settings to begin.</p>
+
+            <h3 class="section-title">1. Choose category</h3>
+            <div class="category-grid">
+                <div class="category-card">
+                    <span class="selected-pill">Selected</span>
+                    <h3>General Knowledge</h3>
+                    <p>Trivia across all topics & pop culture.</p>
+                </div>
+                <div class="category-card">
+                    <h3>Computers & Tech</h3>
+                    <p>Hardware, software & digital world.</p>
+                </div>
+                <div class="category-card">
+                    <h3>Science & Nature</h3>
+                    <p>Biology, physics, chemistry & space.</p>
+                </div>
+                <div class="category-card">
+                    <h3>History</h3>
+                    <p>World events, leaders & ancient eras.</p>
+                </div>
+                <div class="category-card">
+                    <h3>Geography</h3>
+                    <p>Countries, capitals, maps & landmarks.</p>
+                </div>
+                <div class="category-card">
+                    <h3>Films & Movies</h3>
+                    <p>Cinema, blockbusters & actors.</p>
+                </div>
+                <div class="category-card">
+                    <h3>Music</h3>
+                    <p>Classics, pop hits, artists & instruments.</p>
+                </div>
+                <div class="category-card">
+                    <h3>Sports</h3>
+                    <p>Athletics, tournaments & champions.</p>
+                </div>
             </div>
-        <footer class= "footer">
-            <p> It's Time for a Quiz</p>
+
+            <h3 class="section-title">2. Customize Quiz Parameters</h3>
+            <div class="parameters-box">
+                <div class="param-group">
+                    <h4>Difficulty Level</h4>
+                    <div class="pill-group">
+                        <button class="pill-btn">Any Difficulty</button>
+                        <button class="pill-btn">Easy</button>
+                        <button class="pill-btn">Medium</button>
+                        <button class="pill-btn">Hard</button>
+                    </div>
+                </div>
+                <div class="param-group">
+                    <h4>Number of Questions</h4>
+                    <div class="pill-group">
+                        <button class="pill-btn">5 Questions</button>
+                        <button class="pill-btn">10 Questions</button>
+                        <button class="pill-btn">15 Questions</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="start-quiz-btn">Start Quiz &rarr;</button>
         </div>
-   <script type="module" src="js"></script>
+
+        <div id="quiz-section">
+            <div id="question-container">
+            </div>
+            <button id="next-btn">Next Question</button>
+            <div id="quiz-results">
+                <h2>Quiz Complete!</h2>
+                <p id="final-score">You scored 0 out of 0</p>
+            </div>
+        </div>
+
+        <div id="history-section">
+            <h2>Quiz History</h2>
+            <div id="history-container">
+            </div>
+        </div>
+
+    </main>
+
+    <footer id="app-footer">
+        IT'S TIME FOR A QUIZ
+    </footer>
+
+    <script src="quiz.js"></script>
 </body>
 </html>
