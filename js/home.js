@@ -1,13 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    const getStartedButtons = document.querySelectorAll('.get-started-btn');
+    const getStartedBtn = document.getElementById('get-started-btn');
 
-    getStartedButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault(); 
-            
+    if (getStartedBtn) {
+        getStartedBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
             window.location.href = 'quiz.html'; 
         });
-    });
+    } else {
+        console.error("Error: Could not find the button with id 'get-started-btn'");
+    }
 
 });
