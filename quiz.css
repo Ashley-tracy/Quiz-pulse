@@ -202,20 +202,25 @@ body {
 }
 
 #history-section {
-    display: none;
+    display: block;
     margin-top: 50px;
     border-top: 2px solid #ccc;
     padding-top: 20px;
 }
 
 .history-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     background-color: #f4f4f4;
     padding: 15px;
     margin-bottom: 10px;
     border-radius: 8px;
+    display: block;
+}
+
+.history-item > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .delete-btn {

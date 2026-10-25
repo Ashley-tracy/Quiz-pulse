@@ -330,5 +330,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize History on page load
     renderHistory();
     historySection.style.display = 'block';
-
+     setupSection.style.display = 'block';
 });
