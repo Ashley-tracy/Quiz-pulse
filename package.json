@@ -1,0 +1,8 @@
+{
+  "name": "quiz-pulse",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/utils.test.js && node tests/state.test.js && node tests/api.test.js"
+  }
+}

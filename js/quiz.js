@@ -1,27 +1,21 @@
+import { fetchQuizQuestions } from './api.js';
+import { state, resetQuizProgress, getHistory, saveHistory, deleteHistoryItem } from './state.js';
+import { decodeText, shuffleArray } from './utils.js';
+
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. State Variables ---
-    let selectedCategory = '9';
-    let selectedDifficulty = '';
-    let selectedAmount = '5';
-
-    let quizQuestions = [];
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let userAnswers = []; 
-
-    // --- 2. DOM Elements ---
+    // --- DOM Elements ---
     const setupSection = document.getElementById('setup-section');
     const quizSection = document.getElementById('quiz-section');
     const historySection = document.getElementById('history-section');
-    
+
     const startQuizBtn = document.getElementById('start-quiz-btn');
     const questionContainer = document.getElementById('question-container');
     const quizResults = document.getElementById('quiz-results');
     const finalScoreText = document.getElementById('final-score');
     const historyContainer = document.getElementById('history-container');
 
-    // --- 3. Setup Logic (Category & Pills) ---
+    // --- Setup Category Listeners ---
     const categoryCards = document.querySelectorAll('.category-card');
     categoryCards.forEach(card => {
         card.addEventListener('click', () => {
@@ -35,17 +29,18 @@ document.addEventListener('DOMContentLoaded', () => {
             card.appendChild(pill);
 
             const title = card.querySelector('h3').textContent;
-            if (title.includes('General')) selectedCategory = '9';
-            else if (title.includes('Computers')) selectedCategory = '18';
-            else if (title.includes('Science')) selectedCategory = '17';
-            else if (title.includes('History')) selectedCategory = '23';
-            else if (title.includes('Geography')) selectedCategory = '22';
-            else if (title.includes('Films')) selectedCategory = '11';
-            else if (title.includes('Music')) selectedCategory = '12';
-            else if (title.includes('Sports')) selectedCategory = '21';
+            if (title.includes('General')) state.selectedCategory = '9';
+            else if (title.includes('Computers')) state.selectedCategory = '18';
+            else if (title.includes('Science')) state.selectedCategory = '17';
+            else if (title.includes('History')) state.selectedCategory = '23';
+            else if (title.includes('Geography')) state.selectedCategory = '22';
+            else if (title.includes('Films')) state.selectedCategory = '11';
+            else if (title.includes('Music')) state.selectedCategory = '12';
+            else if (title.includes('Sports')) state.selectedCategory = '21';
         });
     });
 
+    // --- Setup Option Listeners ---
     const paramGroups = document.querySelectorAll('.param-group');
     paramGroups.forEach(group => {
         const buttons = group.querySelectorAll('.pill-btn');
@@ -56,47 +51,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.style.transform = 'scale(1.05)';
 
                 const text = btn.textContent.trim();
-                if (text === 'Easy') selectedDifficulty = 'easy';
-                else if (text === 'Medium') selectedDifficulty = 'medium';
-                else if (text === 'Hard') selectedDifficulty = 'hard';
-                else if (text === 'Any Difficulty') selectedDifficulty = '';
-                if (text === '5 Questions') selectedAmount = '5';
-                else if (text === '10 Questions') selectedAmount = '10';
-                else if (text === '15 Questions') selectedAmount = '15';
+                if (text === 'Easy') state.selectedDifficulty = 'easy';
+                else if (text === 'Medium') state.selectedDifficulty = 'medium';
+                else if (text === 'Hard') state.selectedDifficulty = 'hard';
+                else if (text === 'Any Difficulty') state.selectedDifficulty = '';
+
+                if (text === '5 Questions') state.selectedAmount = '5';
+                else if (text === '10 Questions') state.selectedAmount = '10';
+                else if (text === '15 Questions') state.selectedAmount = '15';
             });
         });
     });
 
-    // --- 4. Start Quiz ---
-    let lastRequestTime = 0;
+    // --- Start Quiz Action ---
     startQuizBtn.addEventListener('click', async () => {
         const now = Date.now();
-        if (now - lastRequestTime < 5000) {
-            const wait = Math.ceil((5000 - (now - lastRequestTime)) / 1000);
+        if (now - state.lastRequestTime < 5000) {
+            const wait = Math.ceil((5000 - (now - state.lastRequestTime)) / 1000);
             alert(`Please wait ${wait} more second(s) before starting a new quiz.`);
             return;
         }
-        lastRequestTime = now;
+        state.lastRequestTime = now;
 
         startQuizBtn.textContent = 'Loading...';
         startQuizBtn.disabled = true;
 
-        // Using utest proxy for the Quiz App
-        const targetUrl = `https://opentdb.com/api.php?amount=${selectedAmount}&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`;
-        const workerUrl = 'https://utestproxy.kipkoechdun676.workers.dev/';
-        const apiUrl = `${workerUrl}?url=${encodeURIComponent(targetUrl)}`;
         try {
-            const response = await fetch(apiUrl);
-            const data = await response.json();
+            const data = await fetchQuizQuestions(state.selectedAmount, state.selectedCategory, state.selectedDifficulty);
 
             if (data.response_code === 0 && data.results.length > 0) {
-                quizQuestions = data.results;
-                currentQuestionIndex = 0;
-                score = 0;
-                userAnswers = [];
+                state.quizQuestions = data.results;
+                resetQuizProgress();
 
                 setupSection.style.display = 'none';
-                historySection.style.display = 'none'; // Hide history during quiz
+                historySection.style.display = 'none';
                 quizSection.style.display = 'block';
                 quizResults.style.display = 'none';
 
@@ -115,25 +103,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- 5. Render Question (with Navigation) ---
+    // --- Render Question ---
     function renderQuestion() {
-        const q = quizQuestions[currentQuestionIndex];
-        const decodeText = (str) => {
-            const doc = new DOMParser().parseFromString(str, "text/html");
-            return doc.documentElement.textContent;
-        };
-
-        let answers = [...q.incorrect_answers.map(decodeText), decodeText(q.correct_answer)];
-        answers = answers.sort(() => Math.random() - 0.5);
+        const q = state.quizQuestions[state.currentQuestionIndex];
+        const rawAnswers = [...q.incorrect_answers.map(decodeText), decodeText(q.correct_answer)];
+        const answers = shuffleArray(rawAnswers);
         const correctAnswer = decodeText(q.correct_answer);
 
+        const isLastQuestion = state.currentQuestionIndex === state.quizQuestions.length - 1;
+
         questionContainer.innerHTML = `
-            <h3 style="color: #d63691;">Question ${currentQuestionIndex + 1} of ${quizQuestions.length}</h3>
+            <h3 style="color: #d63691;">Question ${state.currentQuestionIndex + 1} of ${state.quizQuestions.length}</h3>
             <p style="font-size: 1.2rem; margin-bottom: 20px;">${decodeText(q.question)}</p>
             <div id="answers-wrapper"></div>
             <div style="display:flex; justify-content: space-between; margin-top: 20px;">
-                <button id="prev-nav-btn" style="display:${currentQuestionIndex === 0 ? 'none' : 'block'}; padding: 10px 20px; cursor: pointer;">&larr; Previous</button>
-                <button id="next-nav-btn" style="padding: 10px 20px; cursor: pointer;">${currentQuestionIndex === quizQuestions.length - 1 ? 'Finish Quiz →' : 'Next →'}</button>
+                <button id="prev-nav-btn" style="display:${state.currentQuestionIndex === 0 ? 'none' : 'block'}; padding: 10px 20px; cursor: pointer;">&larr; Previous</button>
+                <button id="next-nav-btn" style="padding: 10px 20px; cursor: pointer;">${isLastQuestion ? 'Finish Quiz →' : 'Next →'}</button>
             </div>
         `;
 
@@ -146,27 +131,25 @@ document.addEventListener('DOMContentLoaded', () => {
             answersWrapper.appendChild(btn);
         });
 
-        // Re-attach navigation events
         document.getElementById('prev-nav-btn')?.addEventListener('click', goToPrevious);
         document.getElementById('next-nav-btn').addEventListener('click', goToNext);
 
-        // If already answered, re-render the selected state
-        if (userAnswers[currentQuestionIndex]) {
-            restoreAnsweredState(userAnswers[currentQuestionIndex].selected, correctAnswer);
+        if (state.userAnswers[state.currentQuestionIndex]) {
+            restoreAnsweredState(state.userAnswers[state.currentQuestionIndex].selected, correctAnswer);
         }
     }
 
-    // --- 6. Check Answer ---
+    // --- Check Answer ---
     function checkAnswer(clickedBtn, selectedAnswer, correctAnswer) {
         const allButtons = document.querySelectorAll('.answer-btn');
         allButtons.forEach(btn => btn.disabled = true);
 
-        userAnswers[currentQuestionIndex] = { selected: selectedAnswer, correct: correctAnswer };
+        state.userAnswers[state.currentQuestionIndex] = { selected: selectedAnswer, correct: correctAnswer };
 
         if (selectedAnswer === correctAnswer) {
             clickedBtn.style.backgroundColor = '#a8e6cf';
             clickedBtn.style.borderColor = '#1e8449';
-            score++;
+            state.score++;
         } else {
             clickedBtn.style.backgroundColor = '#ffaaa5';
             clickedBtn.style.borderColor = '#c0392b';
@@ -179,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 7. Restore Answered State ---
+    // --- Restore Answered State ---
     function restoreAnsweredState(selected, correctAnswer) {
         const allButtons = document.querySelectorAll('.answer-btn');
         allButtons.forEach(btn => {
@@ -195,34 +178,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 8. Navigation ---
+    // --- Navigation Handlers ---
     function goToPrevious() {
-        if (currentQuestionIndex > 0) {
-            currentQuestionIndex--;
+        if (state.currentQuestionIndex > 0) {
+            state.currentQuestionIndex--;
             renderQuestion();
         }
     }
 
     function goToNext() {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < quizQuestions.length) {
+        state.currentQuestionIndex++;
+        if (state.currentQuestionIndex < state.quizQuestions.length) {
             renderQuestion();
         } else {
             finishQuiz();
         }
     }
 
-    // --- 9. Finish Quiz ---
+    // --- Finish Quiz ---
     function finishQuiz() {
         questionContainer.innerHTML = '';
         quizResults.style.display = 'block';
 
-        finalScoreText.textContent = `You scored ${score} out of ${quizQuestions.length}`;
+        finalScoreText.textContent = `You scored ${state.score} out of ${state.quizQuestions.length}`;
 
-        saveHistory(score, quizQuestions.length);
+        saveHistory(state.score, state.quizQuestions.length, state.quizQuestions, state.userAnswers);
         renderHistory();
 
-        // Show home button
         if (!document.getElementById('home-btn')) {
             const home = document.createElement('button');
             home.id = 'home-btn';
@@ -233,35 +215,16 @@ document.addEventListener('DOMContentLoaded', () => {
             home.onclick = () => {
                 quizSection.style.display = 'none';
                 setupSection.style.display = 'block';
-                historySection.style.display = 'block'; // Show history again
+                historySection.style.display = 'block';
                 renderHistory();
             };
             quizResults.appendChild(home);
         }
     }
 
-    // --- 10. History (Expandable) ---
-    function saveHistory(score, total) {
-        let history = JSON.parse(localStorage.getItem('quizHistory')) || [];
-
-        const newRecord = {
-            date: new Date().toLocaleString(),
-            score: score,
-            total: total,
-            questions: quizQuestions.map((q, i) => ({
-                question: q.question,
-                correct: q.correct_answer,
-                selected: userAnswers[i] ? userAnswers[i].selected : 'Not Answered'
-            }))
-        };
-
-        history.unshift(newRecord);
-        if (history.length > 10) history.pop();
-        localStorage.setItem('quizHistory', JSON.stringify(history));
-    }
-
-function renderHistory() {
-        let history = JSON.parse(localStorage.getItem('quizHistory')) || [];
+    // --- History Renderer ---
+    function renderHistory() {
+        const history = getHistory();
         historyContainer.innerHTML = '';
 
         if (history.length === 0) {
@@ -273,7 +236,7 @@ function renderHistory() {
             const div = document.createElement('div');
             div.className = 'history-item';
 
-            let questionsHtml = record.questions.map((q, qi) => {
+            const questionsHtml = record.questions.map((q, qi) => {
                 const isCorrect = q.selected === q.correct;
                 const selectedColor = isCorrect ? 'green' : 'red';
                 return `
@@ -303,22 +266,16 @@ function renderHistory() {
             historyContainer.appendChild(div);
         });
 
-        // Delete event
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                // FIXED: Use currentTarget
                 const index = e.currentTarget.getAttribute('data-index');
-                let history = JSON.parse(localStorage.getItem('quizHistory')) || [];
-                history.splice(index, 1);
-                localStorage.setItem('quizHistory', JSON.stringify(history));
+                deleteHistoryItem(index);
                 renderHistory();
             });
         });
 
-        // View toggle event
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                // FIXED: Use currentTarget and closest() to find the specific detail div
                 const detailDiv = e.currentTarget.closest('.history-item').querySelector('.history-detail');
                 if (detailDiv.style.display === 'none') {
                     detailDiv.style.display = 'block';
@@ -331,8 +288,8 @@ function renderHistory() {
         });
     }
 
-    // Initialize History on page load
+    // --- Initial Load ---
     renderHistory();
     historySection.style.display = 'block';
-     setupSection.style.display = 'block';
+    setupSection.style.display = 'block';
 });
