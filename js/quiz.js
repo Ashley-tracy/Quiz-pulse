@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('quizHistory', JSON.stringify(history));
     }
 
-    function renderHistory() {
+function renderHistory() {
         let history = JSON.parse(localStorage.getItem('quizHistory')) || [];
         historyContainer.innerHTML = '';
 
@@ -272,10 +272,6 @@ document.addEventListener('DOMContentLoaded', () => {
         history.forEach((record, index) => {
             const div = document.createElement('div');
             div.className = 'history-item';
-            div.style.marginBottom = '15px';
-            div.style.padding = '10px';
-            div.style.backgroundColor = '#f9f9f9';
-            div.style.borderRadius = '8px';
 
             let questionsHtml = record.questions.map((q, qi) => {
                 const isCorrect = q.selected === q.correct;
@@ -290,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
 
             div.innerHTML = `
-                <div style="display:flex; justify-content: space-between; align-items: center;">
+                <div class="history-header" style="display:flex; justify-content: space-between; align-items: center;">
                     <div>
                         <strong>Score: ${record.score}/${record.total}</strong>
                         <br><span style="font-size:0.8rem; color:#666;">${record.date}</span>
@@ -300,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="delete-btn" data-index="${index}" style="cursor:pointer; padding: 5px 10px; background-color: #ffaaa5; border: none; border-radius: 4px;">Delete</button>
                     </div>
                 </div>
-                <div class="history-detail" style="display:none; margin-top:15px;">
+                <div class="history-detail" style="display: none; margin-top:15px;">
                     ${questionsHtml}
                 </div>
             `;
@@ -310,7 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Delete event
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const index = e.target.getAttribute('data-index');
+                // FIXED: Use currentTarget
+                const index = e.currentTarget.getAttribute('data-index');
                 let history = JSON.parse(localStorage.getItem('quizHistory')) || [];
                 history.splice(index, 1);
                 localStorage.setItem('quizHistory', JSON.stringify(history));
@@ -321,8 +318,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // View toggle event
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const detailDiv = e.target.closest('.history-item').querySelector('.history-detail');
-                detailDiv.style.display = detailDiv.style.display === 'none' ? 'block' : 'none';
+                // FIXED: Use currentTarget and closest() to find the specific detail div
+                const detailDiv = e.currentTarget.closest('.history-item').querySelector('.history-detail');
+                if (detailDiv.style.display === 'none') {
+                    detailDiv.style.display = 'block';
+                    e.currentTarget.textContent = 'Hide';
+                } else {
+                    detailDiv.style.display = 'none';
+                    e.currentTarget.textContent = 'View';
+                }
             });
         });
     }
