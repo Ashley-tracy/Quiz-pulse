@@ -1,59 +1,57 @@
 # Quiz-pulse
-A simple application where users can answer quiz,see their scores right away ,filter questions by topic and save high scores to a back end database that fetch questions from an API based on category.
+
+**Quiz-pulse** is an interactive web-based trivia application that lets users test their knowledge across various topics, customize quiz settings, receive instant visual feedback, and track their quiz history locally in the browser.
 
 
-## Objectives
-* Provide an intuitive, responsive interface for configuring custom trivia quizzes by category, difficulty, and question count.
-* Fetch and display questions from the Open Trivia Database API via a custom Cloudflare Worker proxy server to handle request routing and CORS.
-* Implement real-time answer verification with visual indicators for correct and incorrect responses.
-* Maintain rate-limiting protection with a 5-second cooldown to prevent API request spamming.
-* Persist completed quiz results and detailed question breakdowns locally using the browser `localStorage` API.
-* Structure frontend code modularly into ES Modules (`app.js`, `api.js`, `state.js`, `utils.js`) for clean separation of concerns.
+
+## Live Demo & Links
+
+* **Live Application Link:** [View Live App](https://your-live-app-link.com)
+* **GitHub Repository Link:** [View Code Repository] (git@github.com:Ashley-tracy/Quiz-pulse.git)
+* **Figma wireframe link::**[https://www.figma.com/design/LbFNL1r1o98xIK85RqiHiy/QUIZ-PULSE?node-id=0-1&t=ZffPsSB2GSWeWNg7-1]
+
+## Features
+* **Custom Quiz Configuration**: Select from 8 trivia categories (General Knowledge, Science, Computers, History, Geography, Films, Music, Sports), choose difficulty levels (Easy, Medium, Hard), and set question amounts (5, 10, or 15 questions).
+* **Dynamic API Integration**: Fetches multiple-choice trivia questions from the Open Trivia Database (OpenTDB) via a custom Cloudflare Worker proxy server.
+* **Rate-Limit Prevention**: Built-in 5-second cooldown timer on starting new quizzes to prevent API throttling.
+* **Interactive Interface**: 
+  * Real-time answer validation with color-coded feedback (green for correct, red for incorrect).
+  * HTML entity decoding and randomized answer choice shuffling.
+  * Question navigation with "Previous" and "Next/Finish" buttons.
+* **Local Quiz History**: Automatically saves completed quiz results and detailed question-by-question breakdowns to browser `localStorage`.
+* **Expandable History Logs**: View question details or delete specific history records at any time.
+* **Modular Codebase**: Built using modern JavaScript ES Modules (`app.js`, `api.js`, `state.js`, `utils.js`).
 
 
-## Technologies Used
-* **HTML**: Page structure and semantic markup.
-* **CSS**: Layout design, card components, and interactive button states.
-* **JavaScript (ES6 Modules)**: Async API calls, DOM manipulation, state management, and utility helpers.
-* **Open Trivia Database (OpenTDB) API**: Source for trivia question data.
-* **Cloudflare Workers**: Custom proxy handling endpoint requests and CORS headers.
-* **Browser LocalStorage API**: Client-side history storage.
+## Tech Stack
+
+* **Frontend**: HTML5, CSS3, Vanilla JavaScript (ES Modules)
+* **API**: [Open Trivia Database (OpenTDB)](https://opentdb.com/)
+* **Proxy**: Cloudflare Workers (CORS & request routing)
+* **Storage**: Browser `localStorage` API
+* **Testing**: Jest (with `jest-environment-jsdom` and `@babel/preset-env`)
 
 
-## API Endpoints
+## File Structure
 
-### Open Trivia Database Endpoint (Target)
-* **URL**: `https://opentdb.com/api.php`
-* **Method**: `GET`
-* **Query Parameters**:
-  * `amount`: Number of questions requested (`5`, `10`, or `15`).
-  * `category`: Category ID (e.g., `9` for General Knowledge, `18` for Computers, `17` for Science).
-  * `difficulty`: Difficulty level (`easy`, `medium`, `hard`, or `""` for any).
-  * `type`: Set to `multiple` for multiple-choice questions.
+```text
+Quiz-pulse/
+├── index.html        # Main HTML layout
+├── styles.css        # Application styles
+├── app.js            # Main DOM event handlers and application workflow
+├── api.js            # API fetch requests and proxy URL construction
+├── state.js          # Application state & localStorage history management
+├── utils.js          # Helper functions (HTML decoding, array shuffling)
+├── api.test.js       # Unit tests for API fetch operations
+├── state.test.js     # Unit tests for state management & localStorage
+├── utils.test.js     # Unit tests for helper utilities
+├── babel.config.json # Babel configuration for ES Module testing
+└── README.md         # Project documentation
 
-### Proxy Endpoint (Used in Code)
-* **URL**: `https://utestproxy.kipkoechdun676.workers.dev/`
-* **Method**: `GET`
-* **Query Parameter**:
-  * `url`: Encoded target URL (e.g., `https://utestproxy.kipkoechdun676.workers.dev/?url=<ENCODED_OPENTDB_URL>`).
+## What I Learned
 
-
-## Setup Instructions
-
-### Prerequisites
-* A modern web browser (Chrome, Firefox, Edge, or Safari).
-* A local web server extension or tool to support JavaScript ES Modules (`type="module"`).
-
-### Step-by-Step Local Setup
-
-
-# How to access locally
- Navigate into the project directory
-- Clone or download this repository to your computer    (git clone - git@github.com:Ashley-tracy/Quiz-pulse.git)
-- Open the project folder that Git created               (cd quiz-pulse)
-- Double click the new project folder to open it,then the code files from there
-
- or alternative using vs code 
- - Open the project folder in vs code 
- - Install the live server extension
- - Open index.html and click go live on the bottom right.
+* **Cleaning Up Weird Question Text:** Trivia APIs often return symbols like `&quot;` instead of `"`. I learned how to automatically decode these HTML symbols into normal readable text before showing questions to the user.
+* **Organizing Code into Separate Files:** Instead of keeping all my code in one huge file, I learned how to split it into four simple JavaScript files (`app.js`, `api.js`, `state.js`, and `utils.js`). This makes the code much easier to read, update, and fix.
+* **Connecting APIs & Fixing CORS Errors:** I learned why browsers block web pages from directly downloading data from other websites (CORS) and how routing requests through a proxy server solves this problem.
+* **Saving Quiz History in the Browser:** I learned how to use `localStorage` so user scores and previous quiz details stay saved even after refreshing or closing the browser.
+* **Writing Automated Tests:** I learned how to write simple tests with Jest to make sure helper functions (like shuffling answer buttons or saving history) work as expected without having to manually test everything in the browser every time.
