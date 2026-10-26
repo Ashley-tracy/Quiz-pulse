@@ -36,7 +36,6 @@ assert(
     lastFetchUrl.includes(encodeURIComponent('https://opentdb.com/api.php?amount=5&category=9&difficulty=&type=multiple'))
 );
 
-// Failure case — non-ok response
 mockOk = false; mockStatus = 500;
 let threw = false;
 let errMessage = '';

@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Setup Option Listeners ---
+    //Setup Option Listeners
     const paramGroups = document.querySelectorAll('.param-group');
     paramGroups.forEach(group => {
         const buttons = group.querySelectorAll('.pill-btn');
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Start Quiz Action ---
+    //Start Quiz Action 
     startQuizBtn.addEventListener('click', async () => {
         const now = Date.now();
         if (now - state.lastRequestTime < 5000) {
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Render Question ---
+    // Render Question 
     function renderQuestion() {
         const q = state.quizQuestions[state.currentQuestionIndex];
         const rawAnswers = [...q.incorrect_answers.map(decodeText), decodeText(q.correct_answer)];
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Check Answer ---
+    //  Check Answer 
     function checkAnswer(clickedBtn, selectedAnswer, correctAnswer) {
         const allButtons = document.querySelectorAll('.answer-btn');
         allButtons.forEach(btn => btn.disabled = true);
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Restore Answered State ---
+    //  Restore Answered State 
     function restoreAnsweredState(selected, correctAnswer) {
         const allButtons = document.querySelectorAll('.answer-btn');
         allButtons.forEach(btn => {
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Navigation Handlers ---
+    // Navigation Handling
     function goToPrevious() {
         if (state.currentQuestionIndex > 0) {
             state.currentQuestionIndex--;
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Finish Quiz ---
+    // Finish Quiz 
     function finishQuiz() {
         questionContainer.innerHTML = '';
         quizResults.style.display = 'block';
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- History Renderer ---
+    // History Renderer 
     function renderHistory() {
         const history = getHistory();
         historyContainer.innerHTML = '';
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Initial Load ---
+    // Initial Loading
     renderHistory();
     historySection.style.display = 'block';
     setupSection.style.display = 'block';

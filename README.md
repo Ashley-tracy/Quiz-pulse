@@ -7,7 +7,7 @@
 ## Live Demo Links
 
 * **Live Application Link:**https://shiny-cannoli-64bc54.netlify.app/
-* **GitHub Repository Link:** git@github.com:Ashley-tracy/Quiz-pulse.git
+* **GitHub Repository Link:** https://github.com/Ashley-tracy/Quiz-pulse.git
 * **Figma wireframe link::**[https://www.figma.com/design/LbFNL1r1o98xIK85RqiHiy/QUIZ-PULSE?node-id=0-1&t=ZffPsSB2GSWeWNg7-1]
 
 ## Features list
