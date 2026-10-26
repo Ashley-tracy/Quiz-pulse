@@ -1,5 +1,4 @@
 # Quiz-pulse
-
 **Quiz-pulse** is an interactive web-based trivia application that lets users test their knowledge across various topics, customize quiz settings, receive instant visual feedback, and track their quiz history locally in the browser.
 
 
@@ -55,8 +54,6 @@
 
 
 ## What I Learned
-* **Cleaning Up Weird Question Text:** Trivia APIs often return symbols like `&quot;` instead of `"`. I learned how to automatically decode these HTML symbols into normal readable text before showing questions to the user.
 * **Organizing Code into Separate Files:** Instead of keeping all my code in one huge file, I learned how to split it into four simple JavaScript files (`app.js`, `api.js`, `state.js`, and `utils.js`). This makes the code much easier to read, update, and fix.
 * **Connecting APIs & Fixing CORS Errors:** I learned why browsers block web pages from directly downloading data from other websites (CORS) and how routing requests through a proxy server solves this problem.
 * **Saving Quiz History in the Browser:** I learned how to use `localStorage` so user scores and previous quiz details stay saved even after refreshing or closing the browser.
-* **Writing Automated Tests:** I learned how to write simple tests with Jest to make sure helper functions (like shuffling answer buttons or saving history) work as expected without having to manually test everything in the browser every time.
