@@ -1,6 +1,5 @@
 // tests/state.test.js
 
-// Mock localStorage before importing state.js
 const store = {};
 globalThis.localStorage = {
     getItem: (k) => (k in store ? store[k] : null),
@@ -27,7 +26,7 @@ const assert = (name, cond) => {
 localStorage.clear();
 assert('getHistory returns [] when empty', Array.isArray(getHistory()) && getHistory().length === 0);
 
-// getHistory — after save
+// getHistory — after saving
 const mockQuestions = [
     { question: 'Q1', correct_answer: 'A' },
     { question: 'Q2', correct_answer: 'B' }
@@ -46,7 +45,6 @@ assert('record stores per-question detail', afterSave[0].questions.length === 2)
 assert('records selected answer', afterSave[0].questions[0].selected === 'A');
 assert('records correct answer', afterSave[0].questions[1].correct === 'B');
 
-// cap at 10
 localStorage.clear();
 for (let i = 0; i < 15; i++) {
     saveHistory(i, 10, mockQuestions, mockAnswers);
